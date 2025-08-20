@@ -16,7 +16,10 @@ struct createGoals: View {
     @State private var startDate = Date()
     @State private var endDate = Date()
     @State private var notifications = "Numeric Target"
+    @State private var numericValue = ""
+    @State private var selectedMetric = ""
     
+    let metrics = ["Pages", "Hours", "Days", "Metrics"]
     let goalTypes = ["Numeric Target", "Habit"]
     let categories = ["Health", "Work", "Personal", "Study"]
     let targets = ["Daily", "Weekly", "Monthly"]
@@ -26,8 +29,8 @@ struct createGoals: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
-                    Text("Goals")
-                        .font(.largeTitle)
+                    Text("Create Goal")
+                        .font(.title)
                         .fontWeight(.bold)
                         .padding(.bottom, 10)
                     
@@ -72,7 +75,41 @@ struct createGoals: View {
                                     .onTapGesture {
                                         goalType = type
                                     }
+                                    
                                     Spacer()
+                                }
+                            }
+                            if goalType == "Numeric Target" {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Numeric Goal Details")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    HStack {
+                                        TextField("Enter target value", text: $numericValue)
+                                            .keyboardType(.decimalPad)
+                                            .padding()
+                                            .background(Color(.systemGray6))
+                                            .cornerRadius(10)
+                                        
+                                        Menu {
+                                            ForEach(metrics, id: \.self) { metric in
+                                                Button(metric) {
+                                                    selectedMetric = metric
+                                                }
+                                            }
+                                        } label: {
+                                            HStack {
+                                                Text(selectedMetric.isEmpty ? "Select metric" : selectedMetric)
+                                                Spacer()
+                                                Image(systemName: "chevron.down")
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .padding()
+                                            .background(Color(.systemGray6))
+                                            .cornerRadius(10)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -118,13 +155,18 @@ struct createGoals: View {
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             
+
+                            
                             HStack {
                                 HStack {
                                     Image(systemName: notifications == "Numeric Target" ? "circle.fill" : "circle")
                                         .foregroundColor(notifications == "Numeric Target" ? .blue : .gray)
                                     Text("Numeric Target")
+                                    
+                                    
                                 }
                                 .onTapGesture { notifications = "Numeric Target" }
+                                
                                 
                                 Spacer()
                                 
@@ -134,6 +176,7 @@ struct createGoals: View {
                                     Text("Habit")
                                 }
                                 .onTapGesture { notifications = "Habit" }
+                                
                             }
                         }
                     }

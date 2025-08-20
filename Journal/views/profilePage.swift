@@ -16,3 +16,7 @@ struct profilePage: View {
 #Preview {
     profilePage()
 }
+
+
+
+
