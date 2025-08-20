@@ -29,6 +29,7 @@ struct goalsPage: View {
     ]
     
     var body: some View {
+        NavigationStack{
         VStack(alignment: .leading, spacing: 16) {
             Text("Goals")
                 .font(.title)
@@ -107,7 +108,7 @@ struct goalsPage: View {
                 }
             }
             
-            Button(action: {}) {
+            NavigationLink(destination: createGoals()) {
                 Text("Add goals +")
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -116,6 +117,7 @@ struct goalsPage: View {
             }
             .padding()
         }
+    }
     }
 }
 
