@@ -36,7 +36,7 @@ struct goalsPage: View {
                 .bold()
                 .padding(.horizontal)
             
-            TextField("Search halls", text: $searchText)
+            TextField("Search", text: $searchText)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)

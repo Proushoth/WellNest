@@ -161,21 +161,20 @@ struct createGoals: View {
                                 HStack {
                                     Image(systemName: notifications == "Numeric Target" ? "circle.fill" : "circle")
                                         .foregroundColor(notifications == "Numeric Target" ? .blue : .gray)
-                                    Text("Numeric Target")
+                                    Text("On")
                                     
                                     
                                 }
                                 .onTapGesture { notifications = "Numeric Target" }
                                 
-                                
-                                Spacer()
+    
                                 
                                 HStack {
                                     Image(systemName: notifications == "Habit" ? "circle.fill" : "circle")
                                         .foregroundColor(notifications == "Habit" ? .blue : .gray)
-                                    Text("Habit")
+                                    Text("Off")
                                 }
-                                .onTapGesture { notifications = "Habit" }
+                                .onTapGesture { notifications = "Off" }
                                 
                             }
                         }
