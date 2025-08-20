@@ -28,7 +28,7 @@ struct ContentView: View {
             goalsPage()
                 .tabItem(){
                     Image(systemName: "scope")
-                    Text("calls")
+                    Text("Goals")
                 }
             progressPage()
                 .tabItem(){
