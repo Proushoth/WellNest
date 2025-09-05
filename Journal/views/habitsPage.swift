@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// MARK: - Habit Model
+
 struct Habit: Identifiable {
     let id = UUID()
     let title: String
@@ -17,7 +17,6 @@ struct Habit: Identifiable {
     var completedToday: Bool
 }
 
-// MARK: - Main View
 struct habitsPage: View {
     @State private var searchText = ""
     @State private var selectedFilter = "All"
@@ -43,7 +42,6 @@ struct habitsPage: View {
                             .font(.title)
                             .fontWeight(.bold)
                         
-                        // Search bar
                         HStack {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.gray)
@@ -53,7 +51,6 @@ struct habitsPage: View {
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                         
-                        // Filters
                         Picker("Filters", selection: $selectedFilter) {
                             ForEach(filters, id: \.self) { filter in
                                 Text(filter)
@@ -61,7 +58,6 @@ struct habitsPage: View {
                         }
                         .pickerStyle(.segmented)
                         
-                        // Habit Cards
                         ForEach(habits) { habit in
                             HabitCard(habit: habit)
                         }
@@ -76,13 +72,12 @@ struct habitsPage: View {
                     .padding()
                 }
                 
-                // Floating Action Button
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         Button(action: {
-                            // Add new habit action
+                            
                         }) {
                             Image(systemName: "plus")
                                 .font(.title)

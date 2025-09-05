@@ -181,7 +181,6 @@ struct createGoals: View {
                     }
                     
                     Button(action: {
-                        // Save action
                     }) {
                         Text("Save")
                             .font(.headline)
