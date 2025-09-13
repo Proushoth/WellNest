@@ -6,194 +6,62 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct createGoals: View {
-    @State private var goalName = ""
-    @State private var goalCategory = ""
-    @State private var goalType = "Numeric Target"
-    @State private var goalDescription = ""
-    @State private var target = ""
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var notifications = "Numeric Target"
-    @State private var numericValue = ""
-    @State private var selectedMetric = ""
-    
-    let metrics = ["Pages", "Hours", "Days", "Metrics"]
-    let goalTypes = ["Numeric Target", "Habit"]
-    let categories = ["Health", "Work", "Personal", "Study"]
-    let targets = ["Daily", "Weekly", "Monthly"]
-    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var title = ""
+    @State private var progress: Double = 0.0
+    @State private var streak: String = ""
+    @State private var targetDate = Date()
+    @State private var color: String = "green"
+
+    let colors = ["green", "orange", "blue", "purple"]
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    
-                    Text("Create Goal")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 10)
-                    
-                    VStack(alignment: .leading, spacing: 14) {
-                        
-                        TextField("Goal name", text: $goalName)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(10)
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                        
-                        Menu {
-                            ForEach(categories, id: \.self) { category in
-                                Button(category) {
-                                    goalCategory = category
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text(goalCategory.isEmpty ? "Goal category" : goalCategory)
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(10)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Goal type:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            
-                            HStack {
-                                ForEach(goalTypes, id: \.self) { type in
-                                    HStack {
-                                        Image(systemName: goalType == type ? "circle.fill" : "circle")
-                                            .foregroundColor(goalType == type ? .blue : .gray)
-                                        Text(type)
-                                    }
-                                    .onTapGesture {
-                                        goalType = type
-                                    }
-                                    
-                                    Spacer()
-                                }
-                            }
-                            if goalType == "Numeric Target" {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Numeric Goal Details")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    
-                                    HStack {
-                                        TextField("Enter target value", text: $numericValue)
-                                            .keyboardType(.decimalPad)
-                                            .padding()
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(10)
-                                        
-                                        Menu {
-                                            ForEach(metrics, id: \.self) { metric in
-                                                Button(metric) {
-                                                    selectedMetric = metric
-                                                }
-                                            }
-                                        } label: {
-                                            HStack {
-                                                Text(selectedMetric.isEmpty ? "Select metric" : selectedMetric)
-                                                Spacer()
-                                                Image(systemName: "chevron.down")
-                                                    .foregroundColor(.gray)
-                                            }
-                                            .padding()
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(10)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Goal description:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            TextEditor(text: $goalDescription)
-                                .frame(height: 100)
-                                .padding(8)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
-                                .font(.system(size: 15, design: .rounded))
-                        }
-                        
-                        Menu {
-                            ForEach(targets, id: \.self) { option in
-                                Button(option) {
-                                    target = option
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text(target.isEmpty ? "Target" : target)
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(10)
-                        }
-                        
-                        DatePicker("Start date:", selection: $startDate, displayedComponents: .date)
-                            .font(.system(size: 15, design: .rounded))
-                        
-                        DatePicker("End date:", selection: $endDate, displayedComponents: .date)
-                            .font(.system(size: 15, design: .rounded))
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Notifications:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            
-
-                            
-                            HStack {
-                                HStack {
-                                    Image(systemName: notifications == "Numeric Target" ? "circle.fill" : "circle")
-                                        .foregroundColor(notifications == "Numeric Target" ? .blue : .gray)
-                                    Text("On")
-                                    
-                                    
-                                }
-                                .onTapGesture { notifications = "Numeric Target" }
-                                
-    
-                                
-                                HStack {
-                                    Image(systemName: notifications == "Habit" ? "circle.fill" : "circle")
-                                        .foregroundColor(notifications == "Habit" ? .blue : .gray)
-                                    Text("Off")
-                                }
-                                .onTapGesture { notifications = "Off" }
-                                
-                            }
+            Form {
+                Section(header: Text("Goal Details")) {
+                    TextField("Title", text: $title)
+                    Slider(value: $progress, in: 0...1, step: 0.01) {
+                        Text("Progress")
+                    }
+                    Text("Progress: \(Int(progress * 100))%")
+                        .font(.caption)
+                    TextField("Streak (optional)", text: $streak)
+                    DatePicker("Target Date", selection: $targetDate, displayedComponents: .date)
+                    Picker("Color", selection: $color) {
+                        ForEach(colors, id: \.self) { color in
+                            Text(color.capitalized)
                         }
                     }
-                    
-                    Button(action: {
-                    }) {
-                        Text("Save")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                    }
-                    .padding(.top, 20)
                 }
-                .padding()
+                Section {
+                    Button("Save Goal") {
+                        addGoal()
+                    }
+                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
             }
+            .navigationTitle("Create Goal")
+        }
+    }
+
+    private func addGoal() {
+        let newGoal = GoalEntity(context: viewContext)
+        newGoal.title = title
+        newGoal.progress = progress
+        newGoal.streak = streak.isEmpty ? nil : streak
+        newGoal.targetDate = DateFormatter.localizedString(from: targetDate, dateStyle: .short, timeStyle: .none)
+        newGoal.color = color
+
+        do {
+            try viewContext.save()
+            dismiss()
+        } catch {
+            // Handle error
         }
     }
 }
