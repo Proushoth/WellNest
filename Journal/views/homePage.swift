@@ -5,12 +5,25 @@
 //  Created by proushoth koushal on 8/19/25.
 //
 import SwiftUI
+import CoreData
 
 struct homePage: View {
     @State private var showJournalPage = false
     @State private var showHabitsPage = false
     @State private var showGoalsPage = false
     let userName = "Jphn"
+    
+    // Fetch goals from Core Data
+    @FetchRequest(
+        entity: GoalEntity.entity(),
+        sortDescriptors: []
+    ) private var goals: FetchedResults<GoalEntity>
+    
+    // Fetch habits from Core Data (assuming you have a HabitEntity)
+    @FetchRequest(
+        entity: Habit.entity(),
+        sortDescriptors: []
+    ) private var habits: FetchedResults<Habit>
     
     var body: some View {
         NavigationStack {
@@ -33,9 +46,21 @@ struct homePage: View {
                         Text("🗓 Today’s Snapshot")
                             .font(.headline)
                         HStack(spacing: 60) {
-                            StatCard(title: "Habits", value: "3/5", color: .blue)
-                            StatCard(title: "Journals", value: "1", color: .purple)
-                            StatCard(title: "Goals", value: "65%", color: .orange)
+                            StatCard(
+                                title: "Habits",
+                                value: "\(habits.filter { !$0.isCompleted }.count)/\(habits.count)",
+                                color: .blue
+                            )
+                            StatCard(
+                                title: "Journals",
+                                value: "1", // Update if you have journal count
+                                color: .purple
+                            )
+                            StatCard(
+                                title: "Goals",
+                                value: goals.isEmpty ? "0%" : "\(Int((goals.map { $0.progress }.reduce(0, +) / Double(goals.count)) * 100))%",
+                                color: .orange
+                            )
                         }
                     }
                     .padding()
