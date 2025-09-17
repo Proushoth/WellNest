@@ -19,7 +19,30 @@ struct PersistenceController {
 
     // For SwiftUI previews
     static var preview: PersistenceController = {
+        
+        
         let controller = PersistenceController(inMemory: true)
+        let viewContext = controller.container.viewContext
+
+               // Add some preview habits
+               for i in 1...5 {
+                   let habit = Habit(context: viewContext)
+                   habit.id = UUID()
+                   habit.name = "Preview Habit \(i)"
+                   habit.isCompleted = (i % 2 == 0) // every second habit completed
+                   habit.streak = Int32(i * 2)      // give them some streaks
+                   habit.dateCreated = Date()
+                   habit.lastCompletedDate = habit.isCompleted ? Date() : nil
+               }
+
+               do {
+                   try viewContext.save()
+               } catch {
+                   let nsError = error as NSError
+                   fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+               }
+        
+        
         return controller
     }()
 }
