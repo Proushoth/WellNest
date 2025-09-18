@@ -5,12 +5,15 @@
 //  Created by proushoth koushal on 8/19/25.
 //
 import SwiftUI
+import UIKit
+import UserNotifications
 import CoreData
 
 struct homePage: View {
     @State private var showJournalPage = false
     @State private var showHabitsPage = false
     @State private var showGoalsPage = false
+    @State private var showMoodTrendPage = false  // Add this line
     let userName = "Jphn"
     
     // Fetch goals from Core Data
@@ -74,7 +77,11 @@ struct homePage: View {
                             .font(.headline)
                         HStack(spacing: 30) {
                             OverviewCard(title: "Habit\nChart", color: .blue)
-                            OverviewCard(title: "Mood\nTrend", color: .green)
+                            Button(action: {
+                                showMoodTrendPage = true
+                            }) {
+                                OverviewCard(title: "Mood\nTrend", color: .green)
+                            }
                             OverviewCard(title: "Goal\nRing", color: .orange)
                         }
                     }
@@ -174,7 +181,7 @@ struct homePage: View {
                 habitsPage()
             }
             .navigationDestination(isPresented: $showGoalsPage) {
-                createGoals()
+                MoodTrend()
             }
         }
     }
@@ -200,6 +207,7 @@ struct StatCard: View {
     }
 }
 
+// Update OverviewCard to be tappable
 struct OverviewCard: View {
     var title: String
     var color: Color

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SignUpPage: View {
+struct SignUp: View {
     @State private var email = ""
     @State private var password = ""
     @State private var errorMessage = ""
@@ -12,84 +12,102 @@ struct SignUpPage: View {
     }
 
     var body: some View {
-        ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.2)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-            VStack(spacing: 28) {
-                Spacer()
+        VStack(spacing: 0) {
+            Spacer()
+            
+            VStack(spacing: 8) {
+                Text("Create account")
+                    .font(.system(size: 32, weight: .light, design: .default))
+                    .foregroundStyle(.primary)
+                
+                Text("Join us today")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.bottom, 60)
+            
+            VStack(spacing: 24) {
                 VStack(spacing: 16) {
-                    Text("Create Account")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                        .padding(.bottom, 8)
-
-                    VStack(spacing: 12) {
-                        HStack {
-                            Image(systemName: "envelope")
-                                .foregroundColor(.blue)
-                            TextField("Email / Username", text: $email)
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-                                .disableAutocorrection(true)
-                                .focused($focusedField, equals: .email)
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(14)
-                        .shadow(color: .blue.opacity(0.08), radius: 4, x: 0, y: 2)
-
-                        HStack {
-                            Image(systemName: "lock")
-                                .foregroundColor(.purple)
-                            SecureField("Password", text: $password)
-                                .focused($focusedField, equals: .password)
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(14)
-                        .shadow(color: .purple.opacity(0.08), radius: 4, x: 0, y: 2)
-                    }
+                    TextField("Email address", text: $email)
+                        .font(.system(size: 16, weight: .regular))
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 0)
+                        .background(Color.clear)
+                        .overlay(
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundStyle(email.isEmpty ? .tertiary : .primary)
+                                .animation(.easeInOut(duration: 0.2), value: email.isEmpty),
+                            alignment: .bottom
+                        )
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .focused($focusedField, equals: .email)
+                    
+                    SecureField("Password", text: $password)
+                        .font(.system(size: 16, weight: .regular))
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 0)
+                        .background(Color.clear)
+                        .overlay(
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundStyle(password.isEmpty ? .tertiary : .primary)
+                                .animation(.easeInOut(duration: 0.2), value: password.isEmpty),
+                            alignment: .bottom
+                        )
+                        .focused($focusedField, equals: .password)
                 }
-
+                .padding(.bottom, 24)
+                
                 if !errorMessage.isEmpty {
                     Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                        .padding(.horizontal)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .transition(.opacity)
+                        .padding(.bottom, 8)
                 }
-
+                
                 if !successMessage.isEmpty {
                     Text(successMessage)
-                        .foregroundColor(.green)
-                        .font(.subheadline)
-                        .padding(.horizontal)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.green)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .transition(.opacity)
+                        .padding(.bottom, 8)
                 }
-
+                
                 Button(action: signUp) {
-                    HStack {
-                        Spacer()
-                        Text("Sign Up")
-                            .font(.headline)
-                            .padding()
-                        Spacer()
-                    }
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
-                    .foregroundColor(.white)
-                    .cornerRadius(14)
-                    .shadow(radius: 4)
+                    Text("Create account")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .disabled(email.trimmingCharacters(in: .whitespaces).isEmpty || password.isEmpty)
-                .opacity(email.trimmingCharacters(in: .whitespaces).isEmpty || password.isEmpty ? 0.6 : 1)
-
-                Spacer()
+                .opacity(email.trimmingCharacters(in: .whitespaces).isEmpty || password.isEmpty ? 0.4 : 1.0)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 40)
+            
+            Spacer()
+            
+            HStack(spacing: 4) {
+                Text("Already have an account?")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(.secondary)
+                
+                Button("Sign in") {
+                    
+                }
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(.primary)
+            }
+            .padding(.bottom, 40)
         }
-        .navigationTitle("Sign Up")
+        .padding(.horizontal, 32)
+        .navigationBarHidden(true)
         .onAppear {
             focusedField = .email
         }
@@ -106,7 +124,7 @@ struct SignUpPage: View {
 
         let success = UserRepository.signUp(email: email, password: password)
         if success {
-            successMessage = "Sign-up successful!"
+            successMessage = "Account created successfully"
             email = ""
             password = ""
         } else {
@@ -116,5 +134,5 @@ struct SignUpPage: View {
 }
 
 #Preview {
-    SignUpPage()
+    SignUp()
 }

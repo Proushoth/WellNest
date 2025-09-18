@@ -1,90 +1,134 @@
 import SwiftUI
+import LocalAuthentication
 
-struct LoginPage: View {
+struct LogIn: View {
+
     @State private var email = ""
     @State private var password = ""
-    @State private var errorMessage = ""
-    @State private var isLoggedIn = false
-
+    @State private var isAuthenticated = false
+    @State private var showError = false
+    
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Text("🌿 Wellness Journal")
-                    .font(.title)
-                    .fontWeight(.bold)
-                Text("\"Your mindful journey starts here\"")
-                    .foregroundColor(.gray)
-
-                TextField("Email / Username", text: $email)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-
-                SecureField("Password", text: $password)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                }
-
-                Button("Log In") {
-                    loginUser()
-                }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-
-                Divider().padding(.vertical)
-
-                Button("Continue with Apple") { }
-                Button("Continue with Google") { }
-
-                // 👉 Navigation to SignUpPage
-                HStack {
-                    Text("Don’t have an account?")
-                    NavigationLink("Sign Up") {
-                        SignUpPage()
-                    }
-                    .foregroundColor(.blue)
-                }
-
-                // Navigate to Home page on success
-                NavigationLink(destination: profilePage(), isActive: $isLoggedIn) {
-                    EmptyView()
-                }
-
+            VStack(spacing: 0) {
                 Spacer()
+                
+                VStack(spacing: 8) {
+                    Text("Welcome")
+                        .font(.system(size: 32, weight: .light, design: .default))
+                        .foregroundStyle(.primary)
+                    
+                    Text("Sign in to continue")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.bottom, 60)
+                
+                VStack(spacing: 24) {
+                    VStack(spacing: 16) {
+                        TextField("Email address", text: $email)
+                            .font(.system(size: 16, weight: .regular))
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 0)
+                            .background(Color.clear)
+                            .overlay(
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundStyle(email.isEmpty ? .tertiary : .primary)
+                                    .animation(.easeInOut(duration: 0.2), value: email.isEmpty),
+                                alignment: .bottom
+                            )
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.emailAddress)
+                        
+                        SecureField("Password", text: $password)
+                            .font(.system(size: 16, weight: .regular))
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 0)
+                            .background(Color.clear)
+                            .overlay(
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundStyle(password.isEmpty ? .tertiary : .primary)
+                                    .animation(.easeInOut(duration: 0.2), value: password.isEmpty),
+                                alignment: .bottom
+                            )
+                    }
+                    .padding(.bottom, 24)
+                    
+                    Button(action: {
+                        Task {
+                            await authenticateUser()
+                        }
+                    }) {
+                        Text("Sign in")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    
+                    Button(action: {
+//                        Task {
+//                            if await authManager.authenticateWithBiometrics() {
+//                                isAuthenticated = true
+//                            }
+//                        }
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "faceid")
+                                .font(.system(size: 18, weight: .regular))
+                            Text("Use Face ID")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundStyle(.primary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(.quaternary, lineWidth: 1)
+                        )
+                    }
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 4) {
+                    Text("Don't have an account?")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(.secondary)
+                    
+                    NavigationLink("Sign up", destination: SignUp())
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.primary)
+                }
+                .padding(.bottom, 40)
             }
-            .padding()
+            .padding(.horizontal, 32)
+            .navigationBarHidden(true)
+            .navigationDestination(isPresented: $isAuthenticated) {
+                ContentView()
+            }
+            .alert("Authentication failed", isPresented: $showError) {
+                Button("Try again", role: .cancel) { }
+            } message: {
+                Text("Please check your credentials and try again.")
+            }
         }
     }
-
-    func loginUser() {
-        errorMessage = ""
-        
-        guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Please fill all fields"
-            return
-        }
-        
-        let success = UserRepository.login(email: email, password: password)
-        if success {
-            isLoggedIn = true
+    
+    private func authenticateUser() async {
+        if UserRepository.login(email: email, password: password) {
+            isAuthenticated = true
         } else {
-            errorMessage = "Invalid email or password"
+            showError = true
         }
     }
 }
 
-
 #Preview {
-    LoginPage()
+    LogIn()
 }
