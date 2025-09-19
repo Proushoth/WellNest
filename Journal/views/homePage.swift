@@ -1,22 +1,14 @@
-//
-//  homePage.swift
-//  Journal
-//
-//  Created by proushoth koushal on 8/19/25.
-//
 import SwiftUI
 import UIKit
 import UserNotifications
 import CoreData
 
-
 struct homePage: View {
     @State private var showJournalPage = false
     @State private var showHabitsPage = false
     @State private var showGoalsPage = false
-    @State private var showMoodTrendPage = false  // Add this line
+    @State private var showMoodTrendPage = false
     let userName = "Jphn"
-    
 
     @FetchRequest(
         entity: GoalEntity.entity(),
@@ -32,7 +24,6 @@ struct homePage: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    
                     VStack(alignment: .leading, spacing: 6) {
                         Text("👋 Good Afternoon, \(userName)")
                             .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -57,7 +48,6 @@ struct homePage: View {
                             StatCard(
                                 title: "Journals",
                                 value: "1",
-                                journal count
                                 color: .purple
                             )
                             StatCard(
@@ -72,18 +62,25 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .blue.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                    
                     VStack(alignment: .leading, spacing: 20) {
                         Text("📊 Progress Overview")
                             .font(.headline)
                         HStack(spacing: 30) {
-                            OverviewCard(title: "Habit\nChart", color: .blue)
+                            Button(action: {
+                                showHabitsPage = true
+                            }) {
+                                OverviewCard(title: "Habit\nChart", color: .blue)
+                            }
                             Button(action: {
                                 showMoodTrendPage = true
                             }) {
                                 OverviewCard(title: "Mood\nTrend", color: .green)
                             }
-                            OverviewCard(title: "Goal\nRing", color: .orange)
+                            Button(action: {
+                                showGoalsPage = true
+                            }) {
+                                OverviewCard(title: "Goal\nRing", color: .orange)
+                            }
                         }
                     }
                     .padding()
@@ -91,7 +88,6 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .green.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-              
                     VStack(alignment: .leading, spacing: 14) {
                         Text("📝 Quick Actions")
                             .font(.headline)
@@ -117,10 +113,10 @@ struct homePage: View {
                                     .fontWeight(.semibold)
                                     .padding(.vertical, 12)
                                     .frame(maxWidth: .infinity)
-                                    .background(LinearGradient(gradient: Gradient(colors: [Color.green.opacity(0.85), Color.green.opacity(0.65)]), startPoint: .leading, endPoint: .trailing))
+                                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.85), Color.blue.opacity(0.65)]), startPoint: .leading, endPoint: .trailing))
                                     .foregroundColor(.white)
                                     .cornerRadius(12)
-                                    .shadow(color: Color.green.opacity(0.12), radius: 4, x: 0, y: 2)
+                                    .shadow(color: Color.blue.opacity(0.12), radius: 4, x: 0, y: 2)
                             }
                             Button(action: {
                                 showGoalsPage = true
@@ -130,10 +126,10 @@ struct homePage: View {
                                     .fontWeight(.semibold)
                                     .padding(.vertical, 12)
                                     .frame(maxWidth: .infinity)
-                                    .background(LinearGradient(gradient: Gradient(colors: [Color.orange.opacity(0.85), Color.orange.opacity(0.65)]), startPoint: .leading, endPoint: .trailing))
+                                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.85), Color.blue.opacity(0.65)]), startPoint: .leading, endPoint: .trailing))
                                     .foregroundColor(.white)
                                     .cornerRadius(12)
-                                    .shadow(color: Color.orange.opacity(0.12), radius: 4, x: 0, y: 2)
+                                    .shadow(color: Color.blue.opacity(0.12), radius: 4, x: 0, y: 2)
                             }
                         }
                     }
@@ -142,7 +138,6 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .orange.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                   
                     VStack(alignment: .leading, spacing: 14) {
                         Text("🎯 Active Goals")
                             .font(.headline)
@@ -154,7 +149,6 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .blue.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                   
                     VStack(alignment: .leading, spacing: 10) {
                         Text("🔔 Upcoming Reminders")
                             .font(.headline)
@@ -179,9 +173,12 @@ struct homePage: View {
                 journalPage()
             }
             .navigationDestination(isPresented: $showHabitsPage) {
-                habitsPage()
+                progressPage()
             }
             .navigationDestination(isPresented: $showGoalsPage) {
+                progressPage()
+            }
+            .navigationDestination(isPresented: $showMoodTrendPage) {
                 MoodTrend()
             }
         }
@@ -208,7 +205,6 @@ struct StatCard: View {
     }
 }
 
-
 struct OverviewCard: View {
     var title: String
     var color: Color
@@ -223,25 +219,6 @@ struct OverviewCard: View {
                     .multilineTextAlignment(.center)
                     .foregroundColor(color)
             )
-    }
-}
-
-struct ActionButton: View {
-    var label: String
-    var color: Color
-    
-    var body: some View {
-        Button(action: {}) {
-            Text(label)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .padding(.vertical, 12)
-                .frame(maxWidth: .infinity)
-                .background(LinearGradient(gradient: Gradient(colors: [color.opacity(0.85), color.opacity(0.65)]), startPoint: .leading, endPoint: .trailing))
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .shadow(color: color.opacity(0.12), radius: 4, x: 0, y: 2)
-        }
     }
 }
 

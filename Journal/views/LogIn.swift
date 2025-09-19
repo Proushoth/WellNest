@@ -8,124 +8,131 @@ struct LogIn: View {
     @State private var isAuthenticated = false
     @State private var showError = false
     @State private var showForgotPassword = false
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case email, password
+    }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Spacer()
+            ZStack {
+                Color(UIColor.systemGroupedBackground).ignoresSafeArea()
                 
-                VStack(spacing: 8) {
-                    Text("Welcome")
-                        .font(.system(size: 32, weight: .light, design: .default))
-                        .foregroundStyle(.primary)
+                VStack(spacing: 0) {
+                    Spacer()
                     
-                    Text("Sign in to continue")
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.bottom, 60)
-                
-                VStack(spacing: 24) {
-                    VStack(spacing: 16) {
-                        TextField("Email address", text: $email)
-                            .font(.system(size: 16, weight: .regular))
-                            .padding(.vertical, 16)
-                            .padding(.horizontal, 0)
-                            .background(Color.clear)
-                            .overlay(
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundStyle(email.isEmpty ? .tertiary : .primary)
-                                    .animation(.easeInOut(duration: 0.2), value: email.isEmpty),
-                                alignment: .bottom
-                            )
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.emailAddress)
+                    VStack(spacing: 8) {
+                        Text("Welcome")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
                         
-                        SecureField("Password", text: $password)
+                        Text("Sign in to continue")
                             .font(.system(size: 16, weight: .regular))
-                            .padding(.vertical, 16)
-                            .padding(.horizontal, 0)
-                            .background(Color.clear)
-                            .overlay(
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundStyle(password.isEmpty ? .tertiary : .primary)
-                                    .animation(.easeInOut(duration: 0.2), value: password.isEmpty),
-                                alignment: .bottom
-                            )
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 60)
                     
-                    Button(action: {
-                        Task {
-                            await authenticateUser()
+                    VStack(spacing: 20) {
+                        // Email Field
+                        TextField("Email address", text: $email)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            )
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .focused($focusedField, equals: .email)
+                        
+                        // Password Field
+                        SecureField("Password", text: $password)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            )
+                            .focused($focusedField, equals: .password)
+                        
+                        // Sign In Button
+                        Button(action: {
+                            Task {
+                                await authenticateUser()
+                            }
+                        }) {
+                            Text("Sign in")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.blue)
+                                        .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                                )
                         }
-                    }) {
-                        Text("Sign in")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(.white)
+                        
+                        // Forgot Password Button
+                        Button(action: {
+                            showForgotPassword = true
+                        }) {
+                            Text("Forgot Password?")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        
+                        // Face ID Button
+                        Button(action: {}) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "faceid")
+                                    .font(.system(size: 18, weight: .regular))
+                                Text("Use Face ID")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .foregroundColor(.primary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(.black)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    
-                    Button(action: {
-                  
-                        showForgotPassword = true
-                    }) {
-                        Text("Forgot Password?")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(.blue)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    }
-                    
-                    Button(action: {
-
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "faceid")
-                                .font(.system(size: 18, weight: .regular))
-                            Text("Use Face ID")
-                                .font(.system(size: 16, weight: .medium))
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                         }
-                        .foregroundStyle(.primary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(.clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(.quaternary, lineWidth: 1)
-                        )
                     }
-                }
-                
-                Spacer()
-                
-                HStack(spacing: 4) {
-                    Text("Don't have an account?")
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(.secondary)
+                    .padding(.horizontal, 0)
                     
-                    NavigationLink("Sign up", destination: SignUp())
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(.primary)
+                    Spacer()
+                    
+                    // Sign Up Navigation
+                    HStack(spacing: 4) {
+                        Text("Don't have an account?")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(.secondary)
+                        
+                        NavigationLink("Sign up", destination: SignUp())
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.bottom, 40)
                 }
-                .padding(.bottom, 40)
-            }
-            .padding(.horizontal, 32)
-            .navigationBarHidden(true)
-            .navigationDestination(isPresented: $isAuthenticated) {
-                ContentView()
-            }
-            .navigationDestination(isPresented: $showForgotPassword) {
-                forgetPassword()
-            }
-            .alert("Authentication failed", isPresented: $showError) {
-                Button("Try again", role: .cancel) { }
-            } message: {
-                Text("Please check your credentials and try again.")
+                .padding(.horizontal, 32)
+                .navigationBarHidden(true)
+                .navigationDestination(isPresented: $isAuthenticated) {
+                    ContentView()
+                }
+                .navigationDestination(isPresented: $showForgotPassword) {
+                    forgetPassword()
+                }
+                .alert("Authentication failed", isPresented: $showError) {
+                    Button("Try again", role: .cancel) { }
+                } message: {
+                    Text("Please check your credentials and try again.")
+                }
+                .onAppear {
+                    focusedField = .email
+                }
             }
         }
     }

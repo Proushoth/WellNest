@@ -8,10 +8,12 @@
 import SwiftUI
 import CoreData
 import UserNotifications
+import CoreMotion
 
 struct habitsPage: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var notificationManager = NotificationManager.shared
+    @StateObject private var motionManager = MotionManager.shared
     @State private var newHabitName = ""
     @State private var showingAddHabit = false
     @State private var selectedDate = Date()
@@ -30,16 +32,14 @@ struct habitsPage: View {
                    
                     headerCard
                     
-                  
                     dateSelector
-                    
                     
                     progressSection
                     
-             
+                    stepsCard
+                    
                     habitsGrid
                     
-                   
                     addHabitButton
                     
                     Spacer(minLength: 100)
@@ -73,11 +73,85 @@ struct habitsPage: View {
             }
             .onAppear {
                 requestNotificationPermissionIfNeeded()
+                motionManager.startTracking()
+            }
+            .onChange(of: motionManager.stepsToday) { steps in
+                checkStepMilestone(steps: steps)
             }
         }
     }
     
+  
+    private var stepsCard: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Steps Today")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Text("\(motionManager.stepsToday)")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.accentColor)
+            }
+            
+            ZStack {
+                Circle()
+                    .stroke(Color(.systemGray5), lineWidth: 8)
+                    .frame(width: 120, height: 120)
+                
+                Circle()
+                    .trim(from: 0, to: min(Double(motionManager.stepsToday) / 10000, 1))
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.green, .mint]),
+                            startPoint: .topTrailing,
+                            endPoint: .bottomLeading
+                        ),
+                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                    )
+                    .frame(width: 120, height: 120)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut(duration: 0.5), value: motionManager.stepsToday)
+                
+                VStack(spacing: 4) {
+                    Text("\(min(motionManager.stepsToday, 10000)) / 10000")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("Steps")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 2)
+        )
+    }
     
+    private func checkStepMilestone(steps: Int) {
+        let milestone = 5000
+        let todayKey = "stepsMilestoneReached_\(Calendar.current.startOfDay(for: Date()))"
+        if steps >= milestone && !UserDefaults.standard.bool(forKey: todayKey) {
+            UserDefaults.standard.set(true, forKey: todayKey)
+            scheduleStepNotification(steps: steps)
+        }
+    }
+    
+    private func scheduleStepNotification(steps: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = "Keep Moving!"
+        content.body = "You've walked \(steps) steps today. Keep it up!"
+        content.sound = .default
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+    }
     private var headerCard: some View {
         VStack(spacing: 16) {
             HStack {
@@ -411,6 +485,25 @@ struct habitsPage: View {
 }
 
 
+class MotionManager: ObservableObject {
+    static let shared = MotionManager()
+    
+    private let pedometer = CMPedometer()
+    @Published var stepsToday: Int = 0
+    
+    func startTracking() {
+        guard CMPedometer.isStepCountingAvailable() else { return }
+        
+        pedometer.startUpdates(from: Calendar.current.startOfDay(for: Date())) { data, error in
+            DispatchQueue.main.async {
+                if let steps = data?.numberOfSteps {
+                    self.stepsToday = steps.intValue
+                }
+            }
+        }
+    }
+}
+
 struct DateCard: View {
     let date: Date
     let isSelected: Bool
@@ -516,6 +609,7 @@ struct HabitCard: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
+    
 }
 
 #Preview {
