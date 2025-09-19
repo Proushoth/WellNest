@@ -30,7 +30,7 @@ struct ContentView: View {
                     Image(systemName: "scope")
                     Text("Goals")
                 }
-            AlertPushNotification()
+           progressPage()
                 .tabItem(){
                     Image(systemName: "chart.bar")
                     Text("Progress")

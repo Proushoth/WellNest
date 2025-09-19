@@ -16,7 +16,6 @@ struct editProfile: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     
-    // This would come from your user data
     private let userEmail = "user@example.com"
     
     var body: some View {
@@ -73,14 +72,13 @@ struct editProfile: View {
     }
     
     private func saveChanges() {
-        // Validate username
+    
         guard !username.isEmpty else {
             alertMessage = "Username cannot be empty"
             showAlert = true
             return
         }
         
-        // If password fields are filled, validate password change
         if !currentPassword.isEmpty || !newPassword.isEmpty || !confirmPassword.isEmpty {
             guard !currentPassword.isEmpty else {
                 alertMessage = "Please enter your current password"
@@ -106,14 +104,12 @@ struct editProfile: View {
                 return
             }
             
-            // Here you would verify the current password and update with new password
-            // Implementation depends on your authentication system
+            
         }
-        
-        // Save username to UserDefaults (replace with your data persistence method)
+   
         UserDefaults.standard.set(username, forKey: "username")
         
-        // Show success message
+
         alertMessage = "Profile updated successfully"
         showAlert = true
     }

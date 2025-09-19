@@ -7,14 +7,16 @@
 
 import SwiftUI
 import CoreData
+import UserNotifications
 
 struct habitsPage: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var notificationManager = NotificationManager.shared
     @State private var newHabitName = ""
     @State private var showingAddHabit = false
     @State private var selectedDate = Date()
+    @State private var showingPermissionAlert = false
     
-    // Fetch habits from Core Data
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Habit.dateCreated, ascending: true)],
         animation: .default
@@ -25,19 +27,19 @@ struct habitsPage: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header Card
+                   
                     headerCard
                     
-                    // Date Selector
+                  
                     dateSelector
                     
-                    // Progress Section
+                    
                     progressSection
                     
-                    // Habits Grid
+             
                     habitsGrid
                     
-                    // Add Habit Button
+                   
                     addHabitButton
                     
                     Spacer(minLength: 100)
@@ -59,10 +61,23 @@ struct habitsPage: View {
             .sheet(isPresented: $showingAddHabit) {
                 addHabitSheet
             }
+            .alert("Enable Notifications", isPresented: $showingPermissionAlert) {
+                Button("Settings") {
+                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(settingsURL)
+                    }
+                }
+                Button("Later", role: .cancel) {}
+            } message: {
+                Text("Enable notifications to get reminders about your habits and celebrate your progress!")
+            }
+            .onAppear {
+                requestNotificationPermissionIfNeeded()
+            }
         }
     }
     
-    // MARK: - Header Card
+    
     private var headerCard: some View {
         VStack(spacing: 16) {
             HStack {
@@ -97,7 +112,7 @@ struct habitsPage: View {
         )
     }
     
-    // MARK: - Date Selector
+  
     private var dateSelector: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Select Date")
@@ -121,7 +136,7 @@ struct habitsPage: View {
         }
     }
     
-    // MARK: - Progress Section
+
     private var progressSection: some View {
         VStack(spacing: 16) {
             HStack {
@@ -175,7 +190,7 @@ struct habitsPage: View {
         )
     }
     
-    // MARK: - Habits Grid
+
     private var habitsGrid: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Habits")
@@ -198,7 +213,7 @@ struct habitsPage: View {
         }
     }
     
-    // MARK: - Add Habit Button
+
     private var addHabitButton: some View {
         Button(action: { showingAddHabit = true }) {
             HStack(spacing: 12) {
@@ -223,7 +238,7 @@ struct habitsPage: View {
         }
     }
     
-    // MARK: - Add Habit Sheet
+ 
     private var addHabitSheet: some View {
         NavigationStack {
             VStack(spacing: 24) {
@@ -293,7 +308,7 @@ struct habitsPage: View {
         .presentationDragIndicator(.visible)
     }
     
-    // MARK: - Helper Methods
+    
     private var completedCount: Int {
         habits.filter { $0.isCompleted }.count
     }
@@ -314,12 +329,21 @@ struct habitsPage: View {
         return dates
     }
     
+    private func requestNotificationPermissionIfNeeded() {
+        notificationManager.checkPermissionStatus { isAuthorized in
+            if !isAuthorized {
+                showingPermissionAlert = true
+            }
+        }
+    }
+    
     private func addHabit() {
         let trimmed = newHabitName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         
+        let habitId = UUID()
         let newHabit = Habit(context: viewContext)
-        newHabit.id = UUID()
+        newHabit.id = habitId
         newHabit.name = trimmed
         newHabit.isCompleted = false
         newHabit.streak = 0
@@ -327,6 +351,11 @@ struct habitsPage: View {
         newHabit.lastCompletedDate = nil
         
         saveContext()
+        
+     
+        notificationManager.scheduleHabitNotification(for: trimmed, habitId: habitId)
+      
+        
         newHabitName = ""
         showingAddHabit = false
     }
@@ -336,10 +365,10 @@ struct habitsPage: View {
         let today = calendar.startOfDay(for: Date())
         
         if habit.isCompleted {
-            // Reset if unchecked
+        
             habit.isCompleted = false
         } else {
-            // Mark as complete
+         
             habit.isCompleted = true
             
             if let lastDate = habit.lastCompletedDate {
@@ -361,7 +390,13 @@ struct habitsPage: View {
     
     private func deleteHabits(offsets: IndexSet) {
         withAnimation {
-            offsets.map { habits[$0] }.forEach(viewContext.delete)
+            offsets.map { habits[$0] }.forEach { habit in
+               
+                if let habitId = habit.id {
+                    notificationManager.removeNotifications(for: habitId)
+                }
+                viewContext.delete(habit)
+            }
             saveContext()
         }
     }
@@ -375,7 +410,7 @@ struct habitsPage: View {
     }
 }
 
-// MARK: - Date Card
+
 struct DateCard: View {
     let date: Date
     let isSelected: Bool
@@ -428,7 +463,6 @@ struct DateCard: View {
     }
 }
 
-// MARK: - Habit Card
 struct HabitCard: View {
     @ObservedObject var habit: Habit
     let toggleAction: () -> Void

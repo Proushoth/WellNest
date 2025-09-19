@@ -621,7 +621,7 @@ struct EditGoalView: View {
         }
     }
     
-    // MARK: - Helper Functions
+   
     
     private func loadGoalData() {
         title = goal.title ?? ""
@@ -647,7 +647,7 @@ struct EditGoalView: View {
     }
 }
 
-// Enhanced Color extension
+
 extension Color {
     init(_ colorString: String) {
         switch colorString.lowercased() {

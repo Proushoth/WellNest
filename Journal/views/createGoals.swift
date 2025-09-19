@@ -61,7 +61,7 @@ struct createGoals: View {
             try viewContext.save()
             dismiss()
         } catch {
-            // Handle error
+          
         }
     }
 }

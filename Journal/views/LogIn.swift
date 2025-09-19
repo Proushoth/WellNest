@@ -7,7 +7,7 @@ struct LogIn: View {
     @State private var password = ""
     @State private var isAuthenticated = false
     @State private var showError = false
-    @State private var showForgotPassword = false 
+    @State private var showForgotPassword = false
 
     var body: some View {
         NavigationStack {
@@ -72,7 +72,7 @@ struct LogIn: View {
                     }
                     
                     Button(action: {
-                        // Navigate to Forgot Password
+                  
                         showForgotPassword = true
                     }) {
                         Text("Forgot Password?")
@@ -82,7 +82,7 @@ struct LogIn: View {
                     }
                     
                     Button(action: {
-                        // Face ID Authentication (optional)
+
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "faceid")

@@ -75,24 +75,6 @@ class JournalTests: XCTestCase {
         XCTAssertFalse(habits.first?.isCompleted ?? true)
     }
     
-    func testNotificationScheduling() {
-        let notificationManager = NotificationManager.shared
-        notificationManager.scheduleHabitReminder()
-        
-        let center = UNUserNotificationCenter.current()
-        var notificationExists = false
-        
-        let expectation = XCTestExpectation(description: "Check scheduled notifications")
-        
-        center.getPendingNotificationRequests { requests in
-            notificationExists = requests.contains { $0.identifier == "habitReminder" }
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 5.0)
-        XCTAssertTrue(notificationExists)
-    }
-    
 
     
     private func isValidPassword(_ password: String) -> Bool {

@@ -17,13 +17,12 @@ struct homePage: View {
     @State private var showMoodTrendPage = false  // Add this line
     let userName = "Jphn"
     
-    // Fetch goals from Core Data
+
     @FetchRequest(
         entity: GoalEntity.entity(),
         sortDescriptors: []
     ) private var goals: FetchedResults<GoalEntity>
     
-    // Fetch habits from Core Data (assuming you have a HabitEntity)
     @FetchRequest(
         entity: Habit.entity(),
         sortDescriptors: []
@@ -57,7 +56,8 @@ struct homePage: View {
                             )
                             StatCard(
                                 title: "Journals",
-                                value: "1", // Update if you have journal count
+                                value: "1",
+                                journal count
                                 color: .purple
                             )
                             StatCard(
@@ -91,7 +91,7 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .green.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                    // Quick Actions
+              
                     VStack(alignment: .leading, spacing: 14) {
                         Text("📝 Quick Actions")
                             .font(.headline)
@@ -142,7 +142,7 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .orange.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                    // Active Goals
+                   
                     VStack(alignment: .leading, spacing: 14) {
                         Text("🎯 Active Goals")
                             .font(.headline)
@@ -154,7 +154,7 @@ struct homePage: View {
                     .cornerRadius(18)
                     .shadow(color: .blue.opacity(0.08), radius: 8, x: 0, y: 4)
                     
-                    // Upcoming Reminders
+                   
                     VStack(alignment: .leading, spacing: 10) {
                         Text("🔔 Upcoming Reminders")
                             .font(.headline)
@@ -208,7 +208,7 @@ struct StatCard: View {
     }
 }
 
-// Update OverviewCard to be tappable
+
 struct OverviewCard: View {
     var title: String
     var color: Color

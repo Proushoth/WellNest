@@ -6,7 +6,7 @@ struct PersistenceController {
     let container: NSPersistentContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "JournalModel") // Use your .xcdatamodeld filename here
+        container = NSPersistentContainer(name: "JournalModel") 
         if inMemory {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }
@@ -17,20 +17,20 @@ struct PersistenceController {
         }
     }
 
-    // For SwiftUI previews
+
     static var preview: PersistenceController = {
         
         
         let controller = PersistenceController(inMemory: true)
         let viewContext = controller.container.viewContext
 
-               // Add some preview habits
+          
                for i in 1...5 {
                    let habit = Habit(context: viewContext)
                    habit.id = UUID()
                    habit.name = "Preview Habit \(i)"
-                   habit.isCompleted = (i % 2 == 0) // every second habit completed
-                   habit.streak = Int32(i * 2)      // give them some streaks
+                   habit.isCompleted = (i % 2 == 0)
+                   habit.streak = Int32(i * 2)
                    habit.dateCreated = Date()
                    habit.lastCompletedDate = habit.isCompleted ? Date() : nil
                }
