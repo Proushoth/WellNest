@@ -1,14 +1,13 @@
 {
-   "Simulator Target Bundle": "Proushoth.Journal"
-   "aps": {
-       "alert": {
-           "title": "All Hands",
-           "body": "Amos has joined the meeting",
-       },
-       "Sound": "default",
-       "badge": 10,
-   },
- "duration": "Current time",
- "startedAt": "Meeting's starting time"
-   
+  "Simulator Target Bundle": "Proushoth.Journal",
+  "aps": {
+    "alert": {
+      "title": "All Hands",
+      "body": "Amos has joined the meeting"
+    },
+    "sound": "default",
+    "badge": 10
+  },
+  "duration": "Current time",
+  "startedAt": "Meeting's starting time"
 }

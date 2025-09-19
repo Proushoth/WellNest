@@ -10,7 +10,8 @@ import Charts
 import CoreData
 
 struct progressPage: View {
-    // Fetch goals and habits from Core Data
+    @State private var showEditProfile = false
+    
     @FetchRequest(
         entity: Goal.entity(),
         sortDescriptors: []
@@ -25,7 +26,6 @@ struct progressPage: View {
         NavigationView {
             ScrollView {
                 LazyVStack(spacing: 24) {
-                    // Header Section
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -40,7 +40,12 @@ struct progressPage: View {
                             }
                             Spacer()
                             
-                            // Summary Cards
+                            Button(action: { showEditProfile = true }) {
+                                Image(systemName: "person.circle")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.blue)
+                            }
+                            
                             HStack(spacing: 12) {
                                 SummaryCard(
                                     title: "Goals",
@@ -61,7 +66,6 @@ struct progressPage: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     
-                    // Goals Section
                     ChartSection(
                         title: "Goals Progress",
                         subtitle: "Your current goal completion status",
@@ -87,7 +91,6 @@ struct progressPage: View {
                         .frame(height: 200)
                     }
                     
-                    // Habits Section
                     ChartSection(
                         title: "Habits Overview",
                         subtitle: "Your established habits",
@@ -116,11 +119,13 @@ struct progressPage: View {
                 .padding(.bottom, 20)
             }
             .background(Color(UIColor.systemGroupedBackground))
+            .sheet(isPresented: $showEditProfile) {
+                editProfile()
+            }
         }
     }
 }
 
-// MARK: - Supporting Views
 struct SummaryCard: View {
     let title: String
     let count: Int
@@ -165,7 +170,6 @@ struct ChartSection<Content: View>: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Section Header
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 20, weight: .medium))
@@ -190,7 +194,6 @@ struct ChartSection<Content: View>: View {
                 Spacer()
             }
             
-            // Chart or Empty State
             if isEmpty {
                 EmptyStateView(message: emptyMessage, color: color)
             } else {

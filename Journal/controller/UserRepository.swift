@@ -41,4 +41,25 @@ struct UserRepository {
             return false
         }
     }
+    
+    static func resetPassword(email: String, newPassword: String) -> Bool {
+        let context = CoreDataManager.shared.context
+        let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "email == %@", email)
+        
+        do {
+            let users = try context.fetch(fetchRequest)
+            guard let user = users.first else {
+                print("User not found")
+                return false
+            }
+            
+            user.password = newPassword
+            try context.save()
+            return true
+        } catch {
+            print("Core Data error: \(error.localizedDescription)")
+            return false
+        }
+    }
 }

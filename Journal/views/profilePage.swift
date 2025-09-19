@@ -12,12 +12,13 @@ struct profilePage: View {
     @State private var email = "john@example.com"
     @State private var notificationsEnabled = true
     @State private var darkModeEnabled = false
+    @State private var isLoggedOut = false
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Profile Header
+                  
                     VStack(spacing: 16) {
                         Image(systemName: "person.circle.fill")
                             .font(.system(size: 80))
@@ -36,33 +37,31 @@ struct profilePage: View {
                     .background(.ultraThinMaterial)
                     .cornerRadius(18)
                     
-                    // Statistics
                     HStack(spacing: 20) {
                         ProfileStatCard(title: "Goals", value: "12", color: .blue)
                         ProfileStatCard(title: "Habits", value: "8", color: .green)
                         ProfileStatCard(title: "Journals", value: "24", color: .purple)
                     }
                     
-                    // Settings
                     VStack(spacing: 8) {
                         SettingsRow(title: "Notifications", icon: "bell.fill", isEnabled: $notificationsEnabled)
                         Divider()
                         SettingsRow(title: "Dark Mode", icon: "moon.fill", isEnabled: $darkModeEnabled)
                         Divider()
                         NavigationLink {
-                            Text("Edit Profile View") // Replace with your edit profile view
+                            Text("Edit Profile View")
                         } label: {
                             SettingsLinkRow(title: "Edit Profile", icon: "person.fill")
                         }
                         Divider()
                         NavigationLink {
-                            Text("Privacy Policy View") // Replace with your privacy policy view
+                            Text("Privacy Policy View")
                         } label: {
                             SettingsLinkRow(title: "Privacy Policy", icon: "lock.fill")
                         }
                         Divider()
                         NavigationLink {
-                            Text("Help & Support View") // Replace with your help view
+                            Text("Help & Support View")
                         } label: {
                             SettingsLinkRow(title: "Help & Support", icon: "questionmark.circle.fill")
                         }
@@ -72,7 +71,10 @@ struct profilePage: View {
                     .cornerRadius(18)
                     
                     Button(action: {
-                        // Handle logout
+                        
+                        UserDefaults.standard.removeObject(forKey: "username")
+                        UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+                        isLoggedOut = true
                     }) {
                         Text("Log Out")
                             .font(.headline)
@@ -80,7 +82,9 @@ struct profilePage: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(
-                                LinearGradient(gradient: Gradient(colors: [.red.opacity(0.8), .red]), startPoint: .leading, endPoint: .trailing)
+                                LinearGradient(gradient: Gradient(colors: [.red.opacity(0.8), .red]), 
+                                             startPoint: .leading, 
+                                             endPoint: .trailing)
                             )
                             .cornerRadius(12)
                     }
@@ -88,8 +92,13 @@ struct profilePage: View {
                 .padding()
             }
             .navigationTitle("Profile")
+            .navigationDestination(isPresented: $isLoggedOut) {
+                LogIn()
+            }
             .background(
-                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.1)]), 
+                              startPoint: .topLeading, 
+                              endPoint: .bottomTrailing)
                     .ignoresSafeArea()
             )
         }

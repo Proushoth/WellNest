@@ -9,6 +9,7 @@ import UIKit
 import UserNotifications
 import CoreData
 
+
 struct homePage: View {
     @State private var showJournalPage = false
     @State private var showHabitsPage = false

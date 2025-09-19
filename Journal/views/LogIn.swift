@@ -7,7 +7,8 @@ struct LogIn: View {
     @State private var password = ""
     @State private var isAuthenticated = false
     @State private var showError = false
-    
+    @State private var showForgotPassword = false 
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -71,11 +72,17 @@ struct LogIn: View {
                     }
                     
                     Button(action: {
-//                        Task {
-//                            if await authManager.authenticateWithBiometrics() {
-//                                isAuthenticated = true
-//                            }
-//                        }
+                        // Navigate to Forgot Password
+                        showForgotPassword = true
+                    }) {
+                        Text("Forgot Password?")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.blue)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    
+                    Button(action: {
+                        // Face ID Authentication (optional)
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "faceid")
@@ -111,6 +118,9 @@ struct LogIn: View {
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $isAuthenticated) {
                 ContentView()
+            }
+            .navigationDestination(isPresented: $showForgotPassword) {
+                forgetPassword()
             }
             .alert("Authentication failed", isPresented: $showError) {
                 Button("Try again", role: .cancel) { }
