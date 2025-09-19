@@ -46,12 +46,15 @@ struct forgetPassword: View {
                 Button(action: resetPassword) {
                     Text("Send Reset Link")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(.black)
+                        .background(Color.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .shadow(color: Color.blue.opacity(0.3), radius: 6, x: 0, y: 4)
                 }
+                .disabled(email.isEmpty)
+                .opacity(email.isEmpty ? 0.6 : 1.0)
                 
                 Spacer()
             }

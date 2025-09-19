@@ -30,10 +30,10 @@ struct ContentView: View {
                     Image(systemName: "scope")
                     Text("Goals")
                 }
-           progressPage()
+        profilePage()
                 .tabItem(){
-                    Image(systemName: "chart.bar")
-                    Text("Progress")
+                    Image(systemName: "settings")
+                    Text("Settings")
                 }
         }
 
